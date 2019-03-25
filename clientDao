@@ -1,0 +1,152 @@
+package DAO;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import Model.Cliente;
+
+//classe abstrata
+//serve para tratar o cliente e fazer as opera��es no banco
+public abstract class ClienteDAO {
+	
+	//existe
+	public static boolean existeCliente(int id) {
+		try {
+			DAO.strSQL="";
+			DAO.strSQL=DAO.strSQL +"SELECT id  ";
+			DAO.strSQL=DAO.strSQL +"FROM cliente ";
+			DAO.strSQL=DAO.strSQL +"WHERE id=" + id;
+			
+			ResultSet rstCliente = DAO.criarResultSet(DAO.strSQL);
+			return rstCliente.next();
+
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}		
+		
+	}
+	
+	//select max id
+	public static int buscarMaxIDCliente() {
+		try {
+			DAO.strSQL="";
+			DAO.strSQL=DAO.strSQL +"SELECT MAX(id) AS MaxID ";
+			DAO.strSQL=DAO.strSQL +"FROM cliente ";
+			
+			ResultSet rstCliente = DAO.criarResultSet(DAO.strSQL);
+			
+			return rstCliente.next()?rstCliente.getInt("MaxID"):0;
+			//if (rstCliente.next()) {
+			//	return rstCliente.getInt("MaxID");
+			//} else {
+			//return 0
+			//}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}		
+	}
+	
+	//select one
+	public static Cliente buscarCliente(int id) {
+		try {
+			DAO.strSQL="";
+			DAO.strSQL=DAO.strSQL +"SELECT id, nome, fone ";
+			DAO.strSQL=DAO.strSQL +"FROM cliente ";
+			DAO.strSQL=DAO.strSQL +"WHERE id=" + id;
+			
+			ResultSet rstCliente = DAO.criarResultSet(DAO.strSQL);
+			
+			Cliente cliente = new Cliente();
+
+			if (rstCliente.next()) {
+				cliente.setId(rstCliente.getInt("id"));
+				cliente.setNome(rstCliente.getString("nome"));
+				cliente.setFone(rstCliente.getString("fone"));
+			}
+			return cliente;
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	//select many
+	public static ArrayList<Cliente> listarClientes(){
+		try {
+			DAO.strSQL="";
+			DAO.strSQL=DAO.strSQL +"SELECT id, nome, fone ";
+			DAO.strSQL=DAO.strSQL +"FROM cliente ";
+			DAO.strSQL=DAO.strSQL +"ORDER BY id;";
+			
+			ResultSet rstCliente = DAO.criarResultSet(DAO.strSQL);
+			ArrayList<Cliente> lstCliente = new ArrayList<>();
+			
+			while (rstCliente.next()) {
+				Cliente cliente = new Cliente();
+				cliente.setId(rstCliente.getInt("id"));
+				cliente.setNome(rstCliente.getString("nome"));
+				cliente.setFone(rstCliente.getString("fone"));
+				lstCliente.add(cliente);
+			}
+			rstCliente.close();
+			return lstCliente;
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	//insert
+	public static boolean inserirCliente(Cliente cliente) {
+		int maxID;
+		maxID = buscarMaxIDCliente();
+		
+		DAO.strSQL="";
+		DAO.strSQL= DAO.strSQL + "INSERT INTO cliente (id,nome,fone) \n";
+		DAO.strSQL= DAO.strSQL + "VALUES (";
+		DAO.strSQL= DAO.strSQL + "" + (maxID+1) + ",";
+		DAO.strSQL= DAO.strSQL + "'" + cliente.getNome() + "',";
+		DAO.strSQL= DAO.strSQL + "'" + cliente.getFone() + "'";
+		DAO.strSQL= DAO.strSQL + ")";
+		
+		System.out.println(DAO.strSQL);
+		try {
+			return DAO.executarSQL(DAO.strSQL);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	//update
+	public static boolean atualizarCliente(Cliente cliente, int id) {
+		DAO.strSQL="";
+		DAO.strSQL= DAO.strSQL + "UPDATE cliente SET \n";
+		DAO.strSQL= DAO.strSQL + "nome='" + cliente.getNome() + "',";
+		DAO.strSQL= DAO.strSQL + "fone='" + cliente.getFone() + "' ";
+		DAO.strSQL= DAO.strSQL + "WHERE id=" + id;
+		System.out.println(DAO.strSQL);
+		try {
+			return DAO.executarSQL(DAO.strSQL);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	//delete
+	public static boolean excluirCliente(Cliente cliente) {
+		DAO.strSQL="";
+		DAO.strSQL= DAO.strSQL + "DELETE FROM cliente WHERE id=" + cliente.getId();
+		try {
+			return DAO.executarSQL(DAO.strSQL);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+}
