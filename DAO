@@ -1,0 +1,116 @@
+package DAO;
+
+import java.sql.*;
+
+import Common.Common;
+
+public final class DAO {
+	
+	public static String strSQL;
+	
+	private static final String CONEXAO_DRIVER="com.mysql.jdbc.Driver";
+	private static final String CONEXAO_URL="jdbc:mysql://localhost:3306/POO_Loja";
+	private static final String CONEXAO_USUARIO="root";
+	private static final String CONEXAO_SENHA="root";
+	
+	private static Connection conConexao;
+	private static ResultSet rstResultSet;
+	private static Statement stmStatement;
+	
+	//M�todo para registrar o driver
+	private static void registrarDriver(String strDriver) throws ClassNotFoundException {
+		//Driver driver = new com.mysql.jdbc.Driver();
+	}
+	
+	//M�todo para checar o driver
+	private static boolean checarDriver(String strDriver) throws ClassNotFoundException{
+		try {
+			//Driver driver = DriverManager.getDriver(strDriver);
+			Class.forName(strDriver);
+			return true;
+		} catch (Exception ex) {
+			Common.exibirMensagem(ex.getMessage());
+			return false;
+		}
+	}
+	
+	//Conex�o
+	//M�todo para identificar a conex�o 
+	private static Connection obterConexaoAtiva() throws SQLException, ClassNotFoundException{
+		try {
+			if (conConexao == null) {
+				conConexao = abrirConexao();
+			}
+			if (conConexao.isClosed()) {
+				conConexao = abrirConexao();
+			}
+		} catch (Exception ex) {
+			Common.exibirMensagem(ex.getMessage());
+			return null;
+		}
+		return conConexao;
+	}
+
+	//M�todo para abrir a conex�o
+	private static Connection abrirConexao() throws SQLException, ClassNotFoundException{
+		try {
+			if (checarDriver(CONEXAO_DRIVER)){
+				conConexao = DriverManager.getConnection(CONEXAO_URL,CONEXAO_USUARIO,CONEXAO_SENHA);
+			}
+		} catch (Exception ex) {
+			Common.exibirMensagem(ex.getMessage());
+			ex.printStackTrace();
+		}
+		return conConexao;
+	}
+	
+	//M�todo para fechar a conex�o
+	public static void fecharConexao(){
+		try {
+			conConexao.close();
+		} catch (SQLException ex) {
+			Common.exibirMensagem(ex.getMessage());
+			ex.printStackTrace();
+		}
+		conConexao=null;
+	}
+	
+	//ResultSet
+	//Criar o resultset
+	public static ResultSet criarResultSet(String strSQL) throws SQLException, ClassNotFoundException{
+		try {
+			obterConexaoAtiva();
+			stmStatement = conConexao.createStatement();
+			rstResultSet = stmStatement.executeQuery(strSQL);
+		} catch (Exception ex) {
+			Common.exibirMensagem(ex.getMessage());
+			ex.printStackTrace();
+		}
+		return rstResultSet;
+	}
+	
+	//Eliminar o resultset
+	public static void fecharResultSet() throws SQLException{
+		try {
+			rstResultSet.close();
+			rstResultSet=null;
+		} catch (Exception ex) {
+			Common.exibirMensagem(ex.getMessage());
+			ex.printStackTrace();
+		}
+	}
+	
+	//Execu��o de SQL
+	public static boolean executarSQL(String strSQL) throws ClassNotFoundException, SQLException{
+		try {
+			obterConexaoAtiva();
+			stmStatement = conConexao.createStatement();
+			System.out.println("Registros alterados: " + stmStatement.executeUpdate(strSQL));
+			return true;
+		} catch (Exception ex) {
+			Common.exibirMensagem("Exce��o: " + ex.toString());
+			ex.printStackTrace();
+			return false;
+		}
+	}
+}
