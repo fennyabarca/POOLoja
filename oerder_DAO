@@ -1,0 +1,154 @@
+package DAO;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import Model.Cliente;
+import Model.Pedido;
+
+//classe abstrata
+//serve para tratar o pedido e fazer as opera��es no banco
+public abstract class PedidoDAO {
+	
+	//select max id
+	public int buscarMaxID() {
+		try {
+			DAO.strSQL="";
+			DAO.strSQL=DAO.strSQL +"SELECT MAX(id) AS MaxID ";
+			DAO.strSQL=DAO.strSQL +"FROM pedido ";
+			
+			ResultSet rstPedido = DAO.criarResultSet(DAO.strSQL);
+			
+			return rstPedido.next()?rstPedido.getInt("MaxID"):0;
+
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}		
+	}
+	
+	//select one
+	public Pedido buscarPedido(int id) {
+		try {
+			DAO.strSQL="";
+			DAO.strSQL=DAO.strSQL +"SELECT p.id, p.data, p.valor, p.id_cliente, ";
+			DAO.strSQL=DAO.strSQL +"	c.nome, c.fone ";
+			DAO.strSQL=DAO.strSQL +"FROM pedido p ";
+			DAO.strSQL=DAO.strSQL +"INNER JOIN cliente c ON (p.id_cliente = c.id) ";
+			DAO.strSQL=DAO.strSQL +"WHERE p.id=" + id;
+			
+			ResultSet rstPedido = DAO.criarResultSet(DAO.strSQL);
+			
+			Pedido pedido = new Pedido();
+
+			if (rstPedido.next()) {
+				pedido.setId(rstPedido.getInt("id"));
+				pedido.setData(rstPedido.getDate("data"));
+				pedido.setValor(rstPedido.getFloat("valor"));
+				
+				Cliente cliente = new Cliente(
+						rstPedido.getInt("id_cliente"),
+						rstPedido.getString("nome"),
+						rstPedido.getString("fone")
+						);
+				pedido.setCliente(cliente);
+			}
+			return pedido;
+
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	//select many
+	public ArrayList<Pedido> listarPedidos(){
+		try {
+			DAO.strSQL="";
+			DAO.strSQL=DAO.strSQL +"SELECT p.id, p.data, p.valor, p.id_cliente, ";
+			DAO.strSQL=DAO.strSQL +"	c.nome, c.fone ";
+			DAO.strSQL=DAO.strSQL +"FROM pedido p ";
+			DAO.strSQL=DAO.strSQL +"INNER JOIN cliente c ON (p.id_cliente = c.id) ";
+			DAO.strSQL=DAO.strSQL +"ORDER BY p.id;";
+			
+			ResultSet rstPedido = DAO.criarResultSet(DAO.strSQL);
+			ArrayList<Pedido> lstPedido = new ArrayList<>();
+			
+			while (rstPedido.next()) {
+				Pedido pedido = new Pedido();
+				pedido.setId(rstPedido.getInt("id"));
+				pedido.setData(rstPedido.getDate("data"));
+				pedido.setValor(rstPedido.getFloat("valor"));
+				
+				Cliente cliente = new Cliente(
+						rstPedido.getInt("id_cliente"),
+						rstPedido.getString("nome"),
+						rstPedido.getString("fone")
+						);
+				pedido.setCliente(cliente);
+				
+				lstPedido.add(pedido);
+			}
+			rstPedido.close();
+			return lstPedido;
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	//insert
+	public boolean inserirPedido(Pedido pedido) {
+		int maxID;
+		maxID = this.buscarMaxID();
+		
+		String data = Common.HelperData.converterDataParaTexto(pedido.getData());
+		
+		DAO.strSQL="";
+		DAO.strSQL= DAO.strSQL + "INSERT INTO pedido (id,data,valor,id_cliente) \n";
+		DAO.strSQL= DAO.strSQL + "VALUES (";
+		DAO.strSQL= DAO.strSQL + "" + (maxID+1) + ",";
+		DAO.strSQL= DAO.strSQL + "" + Common.HelperData.converterDataParaMySQL(data) + ",";
+		DAO.strSQL= DAO.strSQL + "" + pedido.getValor() + ",";
+		DAO.strSQL= DAO.strSQL + "" + pedido.getCliente().getId() + "";
+		DAO.strSQL= DAO.strSQL + ")";
+		
+		System.out.println(DAO.strSQL);
+		try {
+			return DAO.executarSQL(DAO.strSQL);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	//update
+	public boolean atualizarCliente(Cliente cliente, int id) {
+		DAO.strSQL="";
+		DAO.strSQL= DAO.strSQL + "UPDATE cliente SET \n";
+		DAO.strSQL= DAO.strSQL + "nome='" + cliente.getNome() + "',";
+		DAO.strSQL= DAO.strSQL + "fone='" + cliente.getFone() + "' ";
+		DAO.strSQL= DAO.strSQL + "WHERE id=" + id;
+		System.out.println(DAO.strSQL);
+		try {
+			return DAO.executarSQL(DAO.strSQL);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	//delete
+	public boolean excluirCliente(Cliente cliente) {
+		DAO.strSQL="";
+		DAO.strSQL= DAO.strSQL + "DELETE FROM cliente WHERE id=" + cliente.getId();
+		try {
+			return DAO.executarSQL(DAO.strSQL);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+}
