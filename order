@@ -1,0 +1,39 @@
+package Model;
+
+import java.util.Date;
+
+public class Pedido {
+	//getters e setters
+	public int getId() {return id;}
+	public void setId(int id) {this.id = id;}
+	public Date getData() {return data;}
+	public void setData(Date data) {this.data = data;}
+	public float getValor() {return valor;}
+	public void setValor(float valor) {this.valor = valor;}
+	public Cliente getCliente() {return cliente;}
+	public void setCliente(Cliente cliente) {this.cliente = cliente;}
+	private int id;
+	private Date data;
+	private float valor;
+	private Cliente cliente;
+	
+	//construtor
+	public Pedido() {
+	}
+	public Pedido(int id) {
+		setId(id);
+	}
+	public Pedido(Date data, float valor, Cliente cliente) {
+		setData(data);
+		setValor(valor);
+		setCliente(cliente);
+	}
+	public Pedido (int id, Date data, float valor, Cliente cliente) {
+		setId(id);
+		setData(data);
+		setValor(valor);
+		setCliente(cliente);
+	}
+}
+
+
