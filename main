@@ -1,0 +1,119 @@
+import java.util.ArrayList;
+
+import Common.*;
+import DAO.ClienteDAO;
+import Model.Cliente;
+
+
+public final class Main {
+
+	public static String strMensagem;
+	public static int opcao;
+	
+	public static void main(String[] args) {
+		//� aqui que vamos testar essa caralha
+		exibirMenu();
+	}
+
+	public static void exibirMenu() {
+		strMensagem = "Escolha a opcao de teste: \n"
+				+ "1 - Selecionar um cliente \n"
+				+ "2 - Selecionar todos os clientes \n"
+				+ "3 - Incluir cliente \n"
+				+ "4 - Alterar cliente \n"
+				+ "5 - Excluir cliente \n"
+				+ "\n"
+				+ "9 - Encerrar";
+		opcao = Common.escolherOpcao(strMensagem);
+		switch(opcao) {
+			case 1: testarSelecaoUnica(); opcao=0; break; 
+			case 2: testarSelecaoMultipla(); opcao=0; break;
+			case 3: testarInclusaoCliente(); opcao=0; break;
+			case 4: testarAlteracaoCliente(); opcao=0; break;
+			case 5: testarExclusaoCliente(); opcao=0; break;
+			case 9: System.exit(0); break;
+			default: Common.exibirMensagem("Opcao invalida!"); opcao=0; break; 
+		}
+	}
+	
+	public static void testarSelecaoUnica() {
+		//selecionar um cliente
+		int id;
+		id = Integer.parseInt(Common.informarDado("Informe o ID do cliente:"));
+		
+		if (!ClienteDAO.existeCliente(id)) {
+			Common.exibirMensagem("Cliente n�o encontrado");
+		} else {
+			Cliente cliente = ClienteDAO.buscarCliente(id);
+			strMensagem = "Cliente encontrado: \n"
+					+ "ID: " + cliente.getId() + "\n"
+					+ "Nome: " + cliente.getNome() + "\n"
+					+ "Fone: " + cliente.getFone(); 
+			Common.exibirMensagem(strMensagem);
+		}
+		exibirMenu();
+	}
+	public static void testarSelecaoMultipla() {
+		//selecionar todos os clientes
+		Common.exibirMensagem("Selecionando varios clientes");
+		ArrayList<Cliente> lstClientes  = ClienteDAO.listarClientes();
+
+		for (Cliente cliente: lstClientes){
+			strMensagem = "Cliente encontrado: \n"
+					+ "ID: " + cliente.getId() + "\n"
+					+ "Nome: " + cliente.getNome() + "\n"
+					+ "Fone: " + cliente.getFone(); 
+			Common.exibirMensagem(strMensagem);
+		}
+		exibirMenu();
+	}
+	public static void testarInclusaoCliente() {
+		//inserir cliente
+		String nome, fone;
+		nome = Common.informarDado("Informe o nome do cliente");
+		fone = Common.informarDado("Informe o telefone do cliente");
+		
+		if (ClienteDAO.inserirCliente(new Cliente(nome,fone))) {
+			Common.exibirMensagem("Cliente cadastrado com sucesso.");
+		} else {
+			Common.exibirMensagem("Nao foi possivel cadastrar o cliente");
+		}
+		exibirMenu();
+	}
+	public static void testarAlteracaoCliente() {
+		//atualizar cliente	
+		int id;
+		String nome, fone;
+		id = Integer.parseInt(Common.informarDado("Informe o ID do cliente"));
+		if (!ClienteDAO.existeCliente(id)) {
+			Common.exibirMensagem("Cliente nao encontrado!");
+		} else {
+			nome = Common.informarDado("Informe o novo nome");
+			fone = Common.informarDado("Informe o novo telefone");
+			
+			Cliente cliente = new Cliente(id,nome,fone);
+			if (ClienteDAO.atualizarCliente(cliente, id)) {
+				Common.exibirMensagem("Cliente atualizado com sucesso");
+			} else {
+				Common.exibirMensagem("Nao foi possivel atualizar o cliente");
+			}
+		}
+		exibirMenu();
+	}
+	public static void testarExclusaoCliente() {
+		//excluir cliente
+		int id;
+		id = Integer.parseInt(Common.informarDado("Informe o ID do cliente"));
+		if (!ClienteDAO.existeCliente(id)) {
+			Common.exibirMensagem("Cliente nao encontrado!");
+		} else {
+			Cliente cliente = new Cliente(id);
+			if (ClienteDAO.excluirCliente(cliente)) {
+				Common.exibirMensagem("Cliente excluido com sucesso");
+			} else {
+				Common.exibirMensagem("Nao foi possivel excluir o cliente");
+			}
+		}
+		exibirMenu();
+	}
+}
