@@ -1,0 +1,102 @@
+package Common;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
+
+import javax.swing.JFormattedTextField;
+import javax.swing.text.MaskFormatter;
+
+public abstract class HelperData {
+	
+	//helper do dia atual
+	public static String getDataAtual(){
+		Date dataOriginal = new Date();
+		Date dataAtual = Date.from(dataOriginal.toInstant());
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		String dataConvertida = formatter.format(dataAtual);
+
+		return dataConvertida;
+	}
+
+	//helper para exibi��o de datas
+	public static final void formatarData(JFormattedTextField ftf) throws ParseException{
+		MaskFormatter mascara = new MaskFormatter("##/##/####");
+		mascara.install(ftf);
+	}
+
+	//Helper para as datas
+	public static final String converterDataParaExibicao(String dataParaConverter){
+		//Formato original
+		if (dataParaConverter==null){
+			return "";
+		} else {
+			try {
+				//Formato original
+				SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-MM-dd");
+				Date dataOriginal = formatoOriginal.parse(dataParaConverter);
+				
+				SimpleDateFormat formatoExibicao = new SimpleDateFormat("dd/MM/yyyy");
+				String dataExibicao = formatoExibicao.format(dataOriginal);
+
+				return dataExibicao;
+				
+			} catch (ParseException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	} 
+
+	public static final String converterDataParaMySQL(String dataParaFormatar){
+		//Formato original
+		try {
+			if (dataParaFormatar=="" || dataParaFormatar==null){
+				return "NULL";
+			} else {
+				//Formato original
+				SimpleDateFormat formatoOriginal = new SimpleDateFormat("dd/MM/yyyy");
+				Date dataOriginal = formatoOriginal.parse(dataParaFormatar);
+				
+				//Formato para o MySQL
+				DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+				String dataConvertida = formatoData.format(dataOriginal);
+
+				return "'" + dataConvertida + "'";
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return "";
+		}
+	} 
+
+	public static final String converterDataDoMySQL(String dataDoMySQL){
+		try {
+			//Formato original
+			SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-MM-dd");
+			Date dataOriginal = formatoOriginal.parse(dataDoMySQL);
+			
+			//Formato pretendido
+			SimpleDateFormat formatoAlterado = new SimpleDateFormat("dd/MM/yyyy");
+			String dataFormatada = formatoAlterado.format(dataOriginal);
+			
+			return dataFormatada;
+
+		} catch (ParseException e) {
+			Common.exibirMensagem(e.toString());
+			return "";
+		}
+	} 
+
+	public static final String converterDataParaTexto(Date date) {
+		if (date.getTime()<=0) {
+			return "";
+		} else {
+			return "'" + date.getYear() + "/" + date.getMonth() + "/" + date.getDay() + "'";
+		}
+	}
+	
+}
