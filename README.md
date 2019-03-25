@@ -1,2 +1,2 @@
 # POOLoja
-Simulação de sistema de gerenciamento de loja
+Simulation of store management system
