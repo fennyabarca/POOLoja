@@ -1,0 +1,31 @@
+package Model;
+
+public class Cliente {
+	//getters e setters
+	public int getId() {return id;}
+	public void setId(int id) {this.id = id;}
+	public String getNome() {return nome;}
+	public void setNome(String nome) {this.nome = nome;}
+	public String getFone() {	return fone;}
+	public void setFone(String fone) {this.fone = fone;}
+
+	private int id;
+	private String nome;
+	private String fone;
+
+	//construtor
+	public Cliente() {
+	}
+	public Cliente(int id) {
+		setId(id);
+	}
+	public Cliente(String nome, String fone) {
+		setNome(nome);
+		setFone(fone);
+	}
+	public Cliente(int id, String nome, String fone) {
+		setId(id);
+		setNome(nome);
+		setFone(fone);
+	}
+}
