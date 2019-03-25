@@ -1,0 +1,24 @@
+package Common;
+
+import java.text.DecimalFormat;
+import java.util.Random;
+
+import javax.swing.JOptionPane;
+
+public abstract class Common {
+	
+	public static final String getNomeSistema(){return "Lojinha Chilena - Fernanda Abarca Systems";}
+	public static void exibirMensagem(String strMensagem){
+		JOptionPane.showMessageDialog(null, strMensagem);
+	}
+	public static int exibirPergunta(String strMensagem){
+		return JOptionPane.showConfirmDialog(null, strMensagem,"Confirma��o", 0, JOptionPane.QUESTION_MESSAGE);
+	}
+	public static int escolherOpcao(String strMensagem) {
+		String option = JOptionPane.showInputDialog(null, strMensagem, 1); 
+		return Integer.parseInt(option);
+	}
+	public static String informarDado(String strMensagem) {
+		return JOptionPane.showInputDialog(null, strMensagem); 
+	}
+}
